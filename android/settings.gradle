@@ -1,6 +1,18 @@
 pluginManagement { includeBuild("../node_modules/@react-native/gradle-plugin") }
 plugins { id("com.facebook.react.settings") }
-extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> ex.autolinkLibrariesFromCommand() }
+
+def getNpxExecutable() {
+    def paths = ["/usr/local/bin/npx", "/opt/homebrew/bin/npx", "/usr/bin/npx"]
+    for (p in paths) {
+        if (new File(p).exists()) return p
+    }
+    return "npx"
+}
+
+extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> 
+    ex.autolinkLibrariesFromCommand([getNpxExecutable(), "@react-native-community/cli", "config"])
+}
+
 rootProject.name = 'Stylish'
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')

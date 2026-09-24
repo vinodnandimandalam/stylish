@@ -2,11 +2,20 @@ apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 
+def getNodeExecutable() {
+    def paths = ["/usr/local/bin/node", "/opt/homebrew/bin/node", "/usr/bin/node"]
+    for (p in paths) {
+        if (file(p).exists()) return p
+    }
+    return "node"
+}
+
 /**
  * This is the configuration block to customize your React Native Android app.
  * By default you don't need to apply any configuration, just uncomment the lines you need.
  */
 react {
+    nodeExecutableAndArgs = [getNodeExecutable()]
     /* Folders */
     //   The root of your project, i.e. where "package.json" lives. Default is '../..'
     // root = file("../../")
