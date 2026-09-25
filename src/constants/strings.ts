@@ -11,4 +11,5 @@ export const strings = {
   onboardingPrev: 'Prev',
   onboardingNext: 'Next',
   onboardingGetStarted: 'Get Started',
+  onboardingSkip: 'Skip',
 };

@@ -56,6 +56,10 @@ const OnboardingCarousel = ({
     });
   };
 
+  const handleSkip = () => {
+    onFinish();
+  };
+
   const handleNext = () => {
     if (isLastSlide) {
       onFinish();
@@ -83,6 +87,13 @@ const OnboardingCarousel = ({
   return (
     <GestureHandlerRootView style={styles.wrapper}>
       <View style={styles.container}>
+        <View style={styles.topBar}>
+          <Text style={styles.slideCounter}>{`${currentIndex + 1}/${slides.length}`}</Text>
+          <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
+            <Text style={styles.skipText}>{strings.onboardingSkip}</Text>
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.contentArea}>
           <Carousel
             ref={carouselRef}
@@ -136,6 +147,29 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: colors.white,
     paddingTop: 16,
+  },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 4,
+    marginTop: 4,
+  },
+  slideCounter: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.textPrimary,
+  },
+  skipButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 4,
+  },
+  skipText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.textPrimary,
   },
   contentArea: {
     flex: 1,
@@ -220,7 +254,7 @@ const styles = StyleSheet.create({
   },
   actionText: {
     color: colors.accentRed,
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '700',
   },
 });
