@@ -1,9 +1,10 @@
 import React from 'react';
-import {StatusBar, StyleSheet, Text, View, useColorScheme} from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import {StatusBar, useColorScheme} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import OnBoarding from './src/modules/onboarding/OnBoarding';
+import {PrivateNavigator, PublicNavigator} from './src/routes/Routes';
 
-//TODO: Implement authentication logic to determine if the user is logged in or not
+// TODO: Implement authentication logic to determine if the user is logged in or not
 const isLoggedIn = false;
 
 function App() {
@@ -12,31 +13,11 @@ function App() {
   return (
     <SafeAreaProvider>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      {isLoggedIn ? <HomeScreen /> : <OnBoarding />}
+      <NavigationContainer>
+        {isLoggedIn ? <PrivateNavigator /> : <PublicNavigator />}
+      </NavigationContainer>
     </SafeAreaProvider>
   );
 }
-
-function HomeScreen() {
-  return (
-    <View style={styles.homeContainer}>
-      <Text style={styles.homeText}>Home Screen</Text>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  homeContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#F5F5F5',
-  },
-  homeText: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#111827',
-  },
-});
 
 export default App;

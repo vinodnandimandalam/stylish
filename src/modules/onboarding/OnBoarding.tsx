@@ -30,13 +30,21 @@ const onboardingSlides: OnboardingSlide[] = [
   },
 ];
 
-const OnBoarding = () => {
+type OnBoardingProps = {
+  onFinish?: () => void;
+  onSkip?: () => void;
+};
+
+const OnBoarding = ({onFinish, onSkip}: OnBoardingProps) => {
   const handleFinish = () => {
     console.log('Onboarding finished');
+    onFinish?.();
   };
 
   const handleSkip = () => {
     console.log('Onboarding skipped');
+    onSkip?.();
+    onFinish?.();
   };
 
   return (
