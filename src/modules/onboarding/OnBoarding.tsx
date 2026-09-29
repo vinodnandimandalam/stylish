@@ -1,9 +1,10 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {StyleSheet, View} from 'react-native';
 import OnboardingCarousel, {
   OnboardingSlide,
 } from '../../components/OnboardingCarousel';
 import {strings} from '../../constants/strings';
+import {setBoolean, STORAGE_KEYS} from '../../utils/MMKVStorage';
 
 const onboardingIcon1 = require('../../assets/images/onboarding-icon1.png');
 const onboardingIcon2 = require('../../assets/images/onboarding-icon2.png');
@@ -36,6 +37,10 @@ type OnBoardingProps = {
 };
 
 const OnBoarding = ({onFinish, onSkip}: OnBoardingProps) => {
+  useEffect(() => {
+    setBoolean(STORAGE_KEYS.HAS_SEEN_ONBOARDING, true);
+  }, []);
+
   const handleFinish = () => {
     console.log('Onboarding finished');
     onFinish?.();
