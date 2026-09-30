@@ -1,42 +1,41 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {StatusBar, useColorScheme} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {Provider} from 'react-redux';
 import {PrivateNavigator, PublicNavigator} from './src/routes/Routes';
 import {SCREENS} from './src/routes/Screens';
-import {getBoolean, setBoolean, STORAGE_KEYS} from './src/utils/MMKVStorage';
+import {useAppSelector} from './src/store/hooks';
+import {store} from './src/store/store';
+import {getBoolean, STORAGE_KEYS} from './src/utils/MMKVStorage';
 
 function App() {
-  const isDarkMode = useColorScheme() === 'dark';
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    () => getBoolean(STORAGE_KEYS.IS_LOGGED_IN) ?? false,
+  return (
+    <Provider store={store}>
+      <AppNavigation />
+    </Provider>
   );
-  const hasSeenOnboarding = getBoolean(STORAGE_KEYS.HAS_SEEN_ONBOARDING) ?? false;
+}
+
+function AppNavigation() {
+  const isDarkMode = useColorScheme() === 'dark';
+  const isAuthenticated = useAppSelector(
+    state => state.auth.isAuthenticated,
+  );
+  const hasSeenOnboarding =
+    getBoolean(STORAGE_KEYS.HAS_SEEN_ONBOARDING) ?? false;
   const initialPublicRoute = hasSeenOnboarding
     ? SCREENS.PUBLIC.LOGIN
     : SCREENS.PUBLIC.ONBOARDING;
-
-  const handleLoginSuccess = () => {
-    setBoolean(STORAGE_KEYS.IS_LOGGED_IN, true);
-    setIsLoggedIn(true);
-  };
-
-  const handleLogoutSuccess = () => {
-    setBoolean(STORAGE_KEYS.IS_LOGGED_IN, false);
-    setIsLoggedIn(false);
-  };
 
   return (
     <SafeAreaProvider>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       <NavigationContainer>
-        {isLoggedIn ? (
-          <PrivateNavigator onLogoutSuccess={handleLogoutSuccess} />
+        {isAuthenticated ? (
+          <PrivateNavigator />
         ) : (
-          <PublicNavigator
-            initialRouteName={initialPublicRoute}
-            onLoginSuccess={handleLoginSuccess}
-          />
+          <PublicNavigator initialRouteName={initialPublicRoute} />
         )}
       </NavigationContainer>
     </SafeAreaProvider>

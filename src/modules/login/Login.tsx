@@ -4,20 +4,18 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {AppButton, EmailInput, PasswordInput} from '../../components';
 import {strings} from '../../constants/strings';
 import {colors} from '../../theme/colors';
-import {loginUser} from './loginService';
+import {useAppDispatch, useAppSelector} from '../../store/hooks';
+import {clearLoginError, login} from '../../store/authSlice';
 import {validateIdentifier, validatePassword} from './validations';
 
-type LoginProps = {
-    onLoginSuccess: () => void;
-};
-
-const Login = ({onLoginSuccess}: LoginProps) => {
+const Login = () => {
+    const dispatch = useAppDispatch();
     const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
     const [identifierTouched, setIdentifierTouched] = useState(false);
     const [passwordTouched, setPasswordTouched] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [requestError, setRequestError] = useState<string>();
+    const isLoading = useAppSelector(state => state.auth.loginStatus === 'loading');
+    const requestError = useAppSelector(state => state.auth.loginError);
 
     const identifierError = validateIdentifier(identifier);
     const passwordError = validatePassword(password);
@@ -25,29 +23,16 @@ const Login = ({onLoginSuccess}: LoginProps) => {
     const handleLoginPress = async () => {
         setIdentifierTouched(true);
         setPasswordTouched(true);
-        setRequestError(undefined);
-
         if (identifierError || passwordError || isLoading) {
             return;
         }
 
-        setIsLoading(true);
-
-        try {
-            await loginUser({
+        await dispatch(
+            login({
                 username: identifier.trim(),
                 password,
-            });
-            onLoginSuccess();
-        } catch (error) {
-            setRequestError(
-                error instanceof Error && error.message
-                    ? error.message
-                    : strings.loginNetworkError,
-            );
-        } finally {
-            setIsLoading(false);
-        }
+            }),
+        );
     };
 
     return (
@@ -61,7 +46,7 @@ const Login = ({onLoginSuccess}: LoginProps) => {
                         value={identifier}
                         onChangeText={value => {
                             setIdentifier(value);
-                            setRequestError(undefined);
+                            dispatch(clearLoginError());
                         }}
                         onBlur={() => setIdentifierTouched(true)}
                         errorMessage={
@@ -72,7 +57,7 @@ const Login = ({onLoginSuccess}: LoginProps) => {
                         value={password}
                         onChangeText={value => {
                             setPassword(value);
-                            setRequestError(undefined);
+                            dispatch(clearLoginError());
                         }}
                         onBlur={() => setPasswordTouched(true)}
                         errorMessage={passwordTouched ? passwordError : undefined}

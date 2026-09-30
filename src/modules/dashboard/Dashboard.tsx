@@ -1,39 +1,24 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {AppButton} from '../../components';
 import {strings} from '../../constants/strings';
 import {colors} from '../../theme/colors';
-import {logoutUser} from './logoutService';
+import {useAppDispatch, useAppSelector} from '../../store/hooks';
+import {clearLogoutError, logout} from '../../store/authSlice';
 
-type DashboardProps = {
-  onLogoutSuccess: () => void;
-};
-
-const Dashboard = ({onLogoutSuccess}: DashboardProps) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string>();
+const Dashboard = () => {
+  const dispatch = useAppDispatch();
+  const isLoading = useAppSelector(state => state.auth.logoutStatus === 'loading');
+  const errorMessage = useAppSelector(state => state.auth.logoutError);
 
   const handleLogout = async () => {
     if (isLoading) {
       return;
     }
 
-    setIsLoading(true);
-    setErrorMessage(undefined);
-
-    try {
-      await logoutUser();
-      onLogoutSuccess();
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error && error.message
-          ? error.message
-          : strings.logoutFailed,
-      );
-    } finally {
-      setIsLoading(false);
-    }
+    dispatch(clearLogoutError());
+    await dispatch(logout());
   };
 
   return (

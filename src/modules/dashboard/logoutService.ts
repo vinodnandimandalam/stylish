@@ -7,8 +7,12 @@ type LogoutResponse = {
   message?: string;
 };
 
-export const logoutUser = async (): Promise<LogoutResponse> => {
-  const response = await apiClient.post<LogoutResponse>(API_ENDPOINTS.AUTH.LOGOUT);
+export const logoutUser = async (accessToken: string): Promise<LogoutResponse> => {
+  const response = await apiClient.post<LogoutResponse>(
+    API_ENDPOINTS.AUTH.LOGOUT,
+    undefined,
+    {headers: {Authorization: `Bearer ${accessToken}`}},
+  );
 
   if (response?.success === false) {
     throw new Error(response.message || strings.logoutFailed);

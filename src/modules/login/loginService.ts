@@ -10,7 +10,11 @@ export type LoginRequest = {
 export type LoginResponse = {
   success?: boolean;
   message?: string;
-  data?: unknown;
+  data?: {
+    accessToken?: string;
+    refreshToken?: string;
+    user?: unknown;
+  };
 };
 
 export const loginUser = async (
