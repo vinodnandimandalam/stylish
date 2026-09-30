@@ -23,17 +23,25 @@ const PrivateStack = createNativeStackNavigator<PrivateStackParamList>();
 
 type PublicNavigatorProps = {
   initialRouteName?: PublicRouteName;
+  onLoginSuccess: () => void;
+};
+
+type PrivateNavigatorProps = {
+  onLogoutSuccess: () => void;
 };
 
 export function PublicNavigator({
   initialRouteName = SCREENS.PUBLIC.ONBOARDING,
+  onLoginSuccess,
 }: PublicNavigatorProps) {
   return (
     <PublicStack.Navigator
       initialRouteName={initialRouteName}
       screenOptions={{headerShown: false}}>
       <PublicStack.Screen name={SCREENS.PUBLIC.ONBOARDING} component={OnBoarding} />
-      <PublicStack.Screen name={SCREENS.PUBLIC.LOGIN} component={Login} />
+      <PublicStack.Screen name={SCREENS.PUBLIC.LOGIN}>
+        {() => <Login onLoginSuccess={onLoginSuccess} />}
+      </PublicStack.Screen>
       <PublicStack.Screen name={SCREENS.PUBLIC.REGISTER} component={Register} />
       <PublicStack.Screen
         name={SCREENS.PUBLIC.FORGOT_PASSWORD}
@@ -43,15 +51,14 @@ export function PublicNavigator({
   );
 }
 
-export function PrivateNavigator() {
+export function PrivateNavigator({onLogoutSuccess}: PrivateNavigatorProps) {
   return (
     <PrivateStack.Navigator
       initialRouteName={SCREENS.PRIVATE.DASHBOARD}
       screenOptions={{headerShown: false}}>
-      <PrivateStack.Screen
-        name={SCREENS.PRIVATE.DASHBOARD}
-        component={Dashboard}
-      />
+      <PrivateStack.Screen name={SCREENS.PRIVATE.DASHBOARD}>
+        {() => <Dashboard onLogoutSuccess={onLogoutSuccess} />}
+      </PrivateStack.Screen>
     </PrivateStack.Navigator>
   );
 }
