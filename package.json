@@ -19,6 +19,7 @@
     "@reduxjs/toolkit": "^2.13.0",
     "@rneui/base": "^0.0.0-edge.2",
     "@rneui/themed": "^0.0.0-edge.2",
+    "@shopify/flash-list": "^2.3.2",
     "react": "19.2.3",
     "react-native": "0.87.1",
     "react-native-gesture-handler": "^3.3.0",

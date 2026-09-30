@@ -2,6 +2,7 @@ import {API_BASE_URL} from '../constants/api';
 
 type ApiRequestOptions = {
   headers?: Record<string, string>;
+  baseUrl?: string;
 };
 
 export class ApiError extends Error {
@@ -35,12 +36,13 @@ const request = async <Response>(
   body?: unknown,
   options: ApiRequestOptions = {},
 ): Promise<Response> => {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  const {baseUrl = API_BASE_URL, headers} = options;
+  const response = await fetch(`${baseUrl}${endpoint}`, {
     method,
     headers: {
       Accept: 'application/json',
       ...(body === undefined ? {} : {'Content-Type': 'application/json'}),
-      ...options.headers,
+      ...headers,
     },
     ...(body === undefined ? {} : {body: JSON.stringify(body)}),
   });

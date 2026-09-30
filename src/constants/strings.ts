@@ -26,6 +26,13 @@ export const strings = {
   loginNetworkError: 'Could not connect. Check your connection and try again.',
   dashboardTitle: 'Dashboard',
   homeTitle: 'Home',
+  settingsTitle: 'Settings',
+  productsTitle: 'Explore Products',
+  productsEmpty: 'No products available right now.',
+  productsError: 'Could not load products.',
+  productsRetry: 'Try again',
+  productsLoading: 'Loading products...',
+  productRatingLabel: 'Rating',
   logoutButton: 'Logout',
   logoutFailed: 'Unable to log out. Please try again.',
 };

@@ -8,6 +8,7 @@ import ForgetPwd from '../modules/forget-pwd/ForgetPwd';
 import Dashboard from '../modules/dashboard/Dashboard';
 import TabPlaceholder from '../modules/dashboard/TabPlaceholder';
 import OnBoarding from '../modules/onboarding/OnBoarding';
+import Settings from '../modules/settings/Settings';
 import {
   PrivateTabName,
   PrivateTabParamList,
@@ -39,7 +40,6 @@ const WishlistTab = () => (
 );
 const CartTab = () => <TabPlaceholder title={SCREENS.PRIVATE.CART} />;
 const SearchTab = () => <TabPlaceholder title={SCREENS.PRIVATE.SEARCH} />;
-const SettingsTab = () => <TabPlaceholder title={SCREENS.PRIVATE.SETTINGS} />;
 
 const renderTabIcon = (routeName: PrivateTabName, color: string) => {
   return (
@@ -97,7 +97,7 @@ export function PrivateNavigator() {
       <PrivateTabs.Screen name={SCREENS.PRIVATE.SEARCH} component={SearchTab} />
       <PrivateTabs.Screen
         name={SCREENS.PRIVATE.SETTINGS}
-        component={SettingsTab}
+        component={Settings}
       />
     </PrivateTabs.Navigator>
   );
