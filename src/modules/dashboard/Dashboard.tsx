@@ -24,7 +24,7 @@ const Dashboard = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>{strings.dashboardTitle}</Text>
+        <Text style={styles.title}>{strings.homeTitle}</Text>
         {errorMessage ? (
           <Text style={styles.error} accessibilityLiveRegion="polite">
             {errorMessage}

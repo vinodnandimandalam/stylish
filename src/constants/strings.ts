@@ -25,6 +25,7 @@ export const strings = {
   loginTokenMissing: 'Login succeeded but the access token was missing.',
   loginNetworkError: 'Could not connect. Check your connection and try again.',
   dashboardTitle: 'Dashboard',
+  homeTitle: 'Home',
   logoutButton: 'Logout',
   logoutFailed: 'Unable to log out. Please try again.',
 };

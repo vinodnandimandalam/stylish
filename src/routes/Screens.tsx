@@ -6,7 +6,11 @@ export const SCREENS = {
     FORGOT_PASSWORD: 'ForgotPassword',
   },
   PRIVATE: {
-    DASHBOARD: 'Dashboard',
+    HOME: 'Home',
+    WISHLIST: 'Wishlist',
+    CART: 'Cart',
+    SEARCH: 'Search',
+    SETTINGS: 'Settings',
   },
 } as const;
 
@@ -16,4 +20,13 @@ export type PublicRouteName =
   | typeof SCREENS.PUBLIC.REGISTER
   | typeof SCREENS.PUBLIC.FORGOT_PASSWORD;
 
-export type PrivateRouteName = typeof SCREENS.PRIVATE.DASHBOARD;
+export type PrivateTabName =
+  (typeof SCREENS.PRIVATE)[keyof typeof SCREENS.PRIVATE];
+
+export type PrivateTabParamList = {
+  [SCREENS.PRIVATE.HOME]: undefined;
+  [SCREENS.PRIVATE.WISHLIST]: undefined;
+  [SCREENS.PRIVATE.CART]: undefined;
+  [SCREENS.PRIVATE.SEARCH]: undefined;
+  [SCREENS.PRIVATE.SETTINGS]: undefined;
+};

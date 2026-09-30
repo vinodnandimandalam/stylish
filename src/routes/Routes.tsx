@@ -1,11 +1,20 @@
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {Image, StyleSheet} from 'react-native';
 import Login from '../modules/login/Login';
 import Register from '../modules/register/Register';
 import ForgetPwd from '../modules/forget-pwd/ForgetPwd';
 import Dashboard from '../modules/dashboard/Dashboard';
+import TabPlaceholder from '../modules/dashboard/TabPlaceholder';
 import OnBoarding from '../modules/onboarding/OnBoarding';
-import {PublicRouteName, SCREENS} from './Screens';
+import {
+  PrivateTabName,
+  PrivateTabParamList,
+  PublicRouteName,
+  SCREENS,
+} from './Screens';
+import {colors} from '../theme/colors';
 
 export type PublicStackParamList = {
   [SCREENS.PUBLIC.ONBOARDING]: undefined;
@@ -14,12 +23,33 @@ export type PublicStackParamList = {
   [SCREENS.PUBLIC.FORGOT_PASSWORD]: undefined;
 };
 
-export type PrivateStackParamList = {
-  [SCREENS.PRIVATE.DASHBOARD]: undefined;
+const PublicStack = createNativeStackNavigator<PublicStackParamList>();
+const PrivateTabs = createBottomTabNavigator<PrivateTabParamList>();
+
+const tabIcons = {
+  [SCREENS.PRIVATE.HOME]: require('../assets/images/home-icon.png'),
+  [SCREENS.PRIVATE.WISHLIST]: require('../assets/images/heart-icon.png'),
+  [SCREENS.PRIVATE.CART]: require('../assets/images/cart-icon.png'),
+  [SCREENS.PRIVATE.SEARCH]: require('../assets/images/search-icon.png'),
+  [SCREENS.PRIVATE.SETTINGS]: require('../assets/images/settings.png'),
 };
 
-const PublicStack = createNativeStackNavigator<PublicStackParamList>();
-const PrivateStack = createNativeStackNavigator<PrivateStackParamList>();
+const WishlistTab = () => (
+  <TabPlaceholder title={SCREENS.PRIVATE.WISHLIST} />
+);
+const CartTab = () => <TabPlaceholder title={SCREENS.PRIVATE.CART} />;
+const SearchTab = () => <TabPlaceholder title={SCREENS.PRIVATE.SEARCH} />;
+const SettingsTab = () => <TabPlaceholder title={SCREENS.PRIVATE.SETTINGS} />;
+
+const renderTabIcon = (routeName: PrivateTabName, color: string) => {
+  return (
+    <Image
+      source={tabIcons[routeName]}
+      style={[styles.tabIcon, {tintColor: color}]}
+      resizeMode="contain"
+    />
+  );
+};
 
 type PublicNavigatorProps = {
   initialRouteName?: PublicRouteName;
@@ -45,12 +75,49 @@ export function PublicNavigator({
 
 export function PrivateNavigator() {
   return (
-    <PrivateStack.Navigator
-      initialRouteName={SCREENS.PRIVATE.DASHBOARD}
-      screenOptions={{headerShown: false}}>
-      <PrivateStack.Screen name={SCREENS.PRIVATE.DASHBOARD} component={Dashboard} />
-    </PrivateStack.Navigator>
+    <PrivateTabs.Navigator
+      initialRouteName={SCREENS.PRIVATE.HOME}
+      screenOptions={({route}) => ({
+        headerShown: false,
+        tabBarActiveTintColor: colors.accentRed,
+        tabBarInactiveTintColor: colors.textPrimary,
+        tabBarLabelStyle: styles.tabLabel,
+        tabBarStyle: styles.tabBar,
+        tabBarIcon: ({color}) => renderTabIcon(route.name, color),
+      })}>
+      <PrivateTabs.Screen
+        name={SCREENS.PRIVATE.HOME}
+        component={Dashboard}
+      />
+      <PrivateTabs.Screen
+        name={SCREENS.PRIVATE.WISHLIST}
+        component={WishlistTab}
+      />
+      <PrivateTabs.Screen name={SCREENS.PRIVATE.CART} component={CartTab} />
+      <PrivateTabs.Screen name={SCREENS.PRIVATE.SEARCH} component={SearchTab} />
+      <PrivateTabs.Screen
+        name={SCREENS.PRIVATE.SETTINGS}
+        component={SettingsTab}
+      />
+    </PrivateTabs.Navigator>
   );
 }
+
+const styles = StyleSheet.create({
+  tabBar: {
+    backgroundColor: colors.white,
+    borderTopColor: colors.inputBackground,
+    borderTopWidth: 1,
+    paddingTop: 6,
+  },
+  tabLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  tabIcon: {
+    width: 28,
+    height: 28,
+  },
+});
 
 export default PublicNavigator;
