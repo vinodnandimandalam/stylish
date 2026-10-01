@@ -1,15 +1,30 @@
-import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import React, {useState} from 'react';
+import {StyleSheet, Text} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {useDebouncedCallback} from 'use-debounce';
+import {ProductSearchInput} from '../../components';
 import {strings} from '../../constants/strings';
 import {colors} from '../../theme/colors';
 import ProductList from './ProductList';
 
 const Dashboard = () => {
+  const [searchText, setSearchText] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const debouncedSearch = useDebouncedCallback((query: string) => {
+    setDebouncedQuery(query.trim());
+  }, 400);
+
   return (
     <SafeAreaView style={styles.container}>
+      <ProductSearchInput
+        value={searchText}
+        onChangeText={value => {
+          setSearchText(value);
+          debouncedSearch(value);
+        }}
+      />
       <Text style={styles.sectionTitle}>{strings.productsTitle}</Text>
-      <ProductList />
+      <ProductList searchQuery={debouncedQuery} />
     </SafeAreaView>
   );
 };

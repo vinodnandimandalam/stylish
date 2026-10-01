@@ -9,25 +9,40 @@ import type {Product} from './productTypes';
 
 const PAGE_SIZE = 10;
 
-const ProductList = () => {
+type ProductListProps = {
+  searchQuery: string;
+};
+
+const ProductList = ({searchQuery}: ProductListProps) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [nextSkip, setNextSkip] = useState(0);
   const [hasNextPage, setHasNextPage] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const requestInProgress = useRef(false);
+  const activeRequestId = useRef(0);
 
-  const loadPage = useCallback(async (skip: number, replace = false) => {
+  const loadPage = useCallback(async (
+    skip: number,
+    query: string,
+    replace = false,
+    signal?: AbortSignal,
+  ) => {
     if (requestInProgress.current) {
       return;
     }
 
+    const requestId = ++activeRequestId.current;
     requestInProgress.current = true;
     setIsLoading(true);
     setErrorMessage(null);
 
     try {
-      const result = await getProductsPage(skip, PAGE_SIZE);
+      const result = await getProductsPage(skip, PAGE_SIZE, query, signal);
+      if (requestId !== activeRequestId.current) {
+        return;
+      }
+
       setProducts(current => {
         if (replace) {
           return result.products;
@@ -45,24 +60,42 @@ const ProductList = () => {
         result.products.length > 0 && followingSkip < result.total,
       );
     } catch (error) {
+      if (signal?.aborted || requestId !== activeRequestId.current) {
+        return;
+      }
+
       setErrorMessage(
         error instanceof Error && error.message
           ? error.message
           : strings.productsError,
       );
     } finally {
-      requestInProgress.current = false;
-      setIsLoading(false);
+      if (requestId === activeRequestId.current) {
+        requestInProgress.current = false;
+        setIsLoading(false);
+      }
     }
   }, []);
 
   useEffect(() => {
-    loadPage(0, true);
-  }, [loadPage]);
+    const controller = new AbortController();
+    activeRequestId.current += 1;
+    requestInProgress.current = false;
+    setProducts([]);
+    setNextSkip(0);
+    setHasNextPage(true);
+    loadPage(0, searchQuery, true, controller.signal);
+
+    return () => {
+      controller.abort();
+      activeRequestId.current += 1;
+      requestInProgress.current = false;
+    };
+  }, [loadPage, searchQuery]);
 
   const handleEndReached = () => {
     if (hasNextPage && !requestInProgress.current) {
-      loadPage(nextSkip);
+      loadPage(nextSkip, searchQuery);
     }
   };
 
@@ -79,7 +112,7 @@ const ProductList = () => {
       return (
         <View style={styles.state}>
           <Text style={styles.stateText}>{errorMessage}</Text>
-          <Pressable onPress={() => loadPage(0, true)}>
+          <Pressable onPress={() => loadPage(0, searchQuery, true)}>
             <Text style={styles.retry}>{strings.productsRetry}</Text>
           </Pressable>
         </View>
@@ -93,7 +126,9 @@ const ProductList = () => {
     isLoading && products.length > 0 ? (
       <ActivityIndicator color={colors.accentRed} style={styles.footer} />
     ) : errorMessage && products.length > 0 ? (
-      <Pressable onPress={() => loadPage(nextSkip)} style={styles.footer}>
+      <Pressable
+        onPress={() => loadPage(nextSkip, searchQuery)}
+        style={styles.footer}>
         <Text style={styles.retry}>{strings.productsRetry}</Text>
       </Pressable>
     ) : null;

@@ -28,6 +28,7 @@ export const strings = {
   homeTitle: 'Home',
   settingsTitle: 'Settings',
   productsTitle: 'Explore Products',
+  productSearchPlaceholder: 'Search any product...',
   productsEmpty: 'No products available right now.',
   productsError: 'Could not load products.',
   productsRetry: 'Try again',

@@ -15,5 +15,6 @@ export const API_ENDPOINTS = {
   },
   DUMMY_JSON: {
     PRODUCTS: '/products',
+    SEARCH_PRODUCTS: '/products/search',
   },
 } as const;
