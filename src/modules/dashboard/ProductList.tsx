@@ -5,15 +5,16 @@ import {strings} from '../../constants/strings';
 import {colors} from '../../theme/colors';
 import ProductCard from './ProductCard';
 import {getProductsPage} from './productService';
-import type {Product} from './productTypes';
+import type {Product, ProductSortOrder} from './productTypes';
 
 const PAGE_SIZE = 10;
 
 type ProductListProps = {
   searchQuery: string;
+  sortOrder: ProductSortOrder;
 };
 
-const ProductList = ({searchQuery}: ProductListProps) => {
+const ProductList = ({searchQuery, sortOrder}: ProductListProps) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [nextSkip, setNextSkip] = useState(0);
   const [hasNextPage, setHasNextPage] = useState(true);
@@ -25,6 +26,7 @@ const ProductList = ({searchQuery}: ProductListProps) => {
   const loadPage = useCallback(async (
     skip: number,
     query: string,
+    order: ProductSortOrder,
     replace = false,
     signal?: AbortSignal,
   ) => {
@@ -38,7 +40,13 @@ const ProductList = ({searchQuery}: ProductListProps) => {
     setErrorMessage(null);
 
     try {
-      const result = await getProductsPage(skip, PAGE_SIZE, query, signal);
+      const result = await getProductsPage(
+        skip,
+        PAGE_SIZE,
+        query,
+        signal,
+        order,
+      );
       if (requestId !== activeRequestId.current) {
         return;
       }
@@ -84,18 +92,18 @@ const ProductList = ({searchQuery}: ProductListProps) => {
     setProducts([]);
     setNextSkip(0);
     setHasNextPage(true);
-    loadPage(0, searchQuery, true, controller.signal);
+    loadPage(0, searchQuery, sortOrder, true, controller.signal);
 
     return () => {
       controller.abort();
       activeRequestId.current += 1;
       requestInProgress.current = false;
     };
-  }, [loadPage, searchQuery]);
+  }, [loadPage, searchQuery, sortOrder]);
 
   const handleEndReached = () => {
     if (hasNextPage && !requestInProgress.current) {
-      loadPage(nextSkip, searchQuery);
+      loadPage(nextSkip, searchQuery, sortOrder);
     }
   };
 
@@ -112,7 +120,7 @@ const ProductList = ({searchQuery}: ProductListProps) => {
       return (
         <View style={styles.state}>
           <Text style={styles.stateText}>{errorMessage}</Text>
-          <Pressable onPress={() => loadPage(0, searchQuery, true)}>
+          <Pressable onPress={() => loadPage(0, searchQuery, sortOrder, true)}>
             <Text style={styles.retry}>{strings.productsRetry}</Text>
           </Pressable>
         </View>
@@ -127,7 +135,7 @@ const ProductList = ({searchQuery}: ProductListProps) => {
       <ActivityIndicator color={colors.accentRed} style={styles.footer} />
     ) : errorMessage && products.length > 0 ? (
       <Pressable
-        onPress={() => loadPage(nextSkip, searchQuery)}
+        onPress={() => loadPage(nextSkip, searchQuery, sortOrder)}
         style={styles.footer}>
         <Text style={styles.retry}>{strings.productsRetry}</Text>
       </Pressable>

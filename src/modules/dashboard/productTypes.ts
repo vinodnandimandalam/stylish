@@ -17,3 +17,5 @@ export type ProductPageResponse = {
   skip: number;
   limit: number;
 };
+
+export type ProductSortOrder = 'asc' | 'desc';

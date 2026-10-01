@@ -1,17 +1,24 @@
 import {API_BASE_URLS, API_ENDPOINTS} from '../../constants/api';
 import {apiClient} from '../../utils/ApiClient';
-import type {ProductPageResponse} from './productTypes';
+import type {ProductPageResponse, ProductSortOrder} from './productTypes';
 
 export const getProductsPage = async (
   skip: number,
   limit = 10,
   searchQuery = '',
   signal?: AbortSignal,
+  sortOrder: ProductSortOrder = 'asc',
 ): Promise<ProductPageResponse> => {
   const normalizedQuery = searchQuery.trim();
-  const endpoint = normalizedQuery
-    ? `${API_ENDPOINTS.DUMMY_JSON.SEARCH_PRODUCTS}?q=${encodeURIComponent(normalizedQuery)}&limit=${limit}&skip=${skip}`
-    : `${API_ENDPOINTS.DUMMY_JSON.PRODUCTS}?limit=${limit}&skip=${skip}`;
+  const path = normalizedQuery
+    ? API_ENDPOINTS.DUMMY_JSON.SEARCH_PRODUCTS
+    : API_ENDPOINTS.DUMMY_JSON.PRODUCTS;
+  const query = normalizedQuery
+    ? `q=${encodeURIComponent(normalizedQuery)}&`
+    : '';
+  const endpoint =
+    `${path}?${query}sortBy=title&order=${sortOrder}` +
+    `&limit=${limit}&skip=${skip}`;
 
   return apiClient.get<ProductPageResponse>(
     endpoint,
