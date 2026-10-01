@@ -9,7 +9,6 @@ export const SCREENS = {
     HOME: 'Home',
     WISHLIST: 'Wishlist',
     CART: 'Cart',
-    SEARCH: 'Search',
     SETTINGS: 'Settings',
   },
 } as const;
@@ -27,6 +26,5 @@ export type PrivateTabParamList = {
   [SCREENS.PRIVATE.HOME]: undefined;
   [SCREENS.PRIVATE.WISHLIST]: undefined;
   [SCREENS.PRIVATE.CART]: undefined;
-  [SCREENS.PRIVATE.SEARCH]: undefined;
   [SCREENS.PRIVATE.SETTINGS]: undefined;
 };

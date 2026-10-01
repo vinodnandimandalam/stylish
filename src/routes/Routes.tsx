@@ -31,7 +31,6 @@ const tabIcons = {
   [SCREENS.PRIVATE.HOME]: require('../assets/images/home-icon.png'),
   [SCREENS.PRIVATE.WISHLIST]: require('../assets/images/heart-icon.png'),
   [SCREENS.PRIVATE.CART]: require('../assets/images/cart-icon.png'),
-  [SCREENS.PRIVATE.SEARCH]: require('../assets/images/search-icon.png'),
   [SCREENS.PRIVATE.SETTINGS]: require('../assets/images/settings.png'),
 };
 
@@ -39,7 +38,6 @@ const WishlistTab = () => (
   <TabPlaceholder title={SCREENS.PRIVATE.WISHLIST} />
 );
 const CartTab = () => <TabPlaceholder title={SCREENS.PRIVATE.CART} />;
-const SearchTab = () => <TabPlaceholder title={SCREENS.PRIVATE.SEARCH} />;
 
 const renderTabIcon = (routeName: PrivateTabName, color: string) => {
   return (
@@ -94,7 +92,6 @@ export function PrivateNavigator() {
         component={WishlistTab}
       />
       <PrivateTabs.Screen name={SCREENS.PRIVATE.CART} component={CartTab} />
-      <PrivateTabs.Screen name={SCREENS.PRIVATE.SEARCH} component={SearchTab} />
       <PrivateTabs.Screen
         name={SCREENS.PRIVATE.SETTINGS}
         component={Settings}
