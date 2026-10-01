@@ -7,6 +7,7 @@ import {
   getAccessToken,
   storeAccessToken,
 } from '../utils/SecureTokenStorage';
+import {clearProductListCache} from '../modules/dashboard/productCache';
 import {logoutUser} from '../modules/dashboard/logoutService';
 import {loginUser, type LoginRequest} from '../modules/login/loginService';
 
@@ -68,6 +69,7 @@ export const logout = createAsyncThunk<void, void, {rejectValue: string}>(
       }
 
       await clearAccessToken();
+      clearProductListCache();
       setBoolean(STORAGE_KEYS.IS_LOGGED_IN, false);
     } catch (error) {
       return rejectWithValue(errorMessage(error, strings.logoutFailed));

@@ -1,9 +1,10 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {ActivityIndicator, Pressable, StyleSheet, Text, View} from 'react-native';
 import {FlashList} from '@shopify/flash-list';
 import {strings} from '../../constants/strings';
 import {colors} from '../../theme/colors';
 import ProductCard from './ProductCard';
+import {getProductListCache, setProductListCache} from './productCache';
 import {getProductsPage} from './productService';
 import type {Product, ProductSortOrder} from './productTypes';
 
@@ -22,11 +23,11 @@ const ProductList = ({searchQuery, sortOrder}: ProductListProps) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const requestInProgress = useRef(false);
   const activeRequestId = useRef(0);
+  const productsRef = useRef<Product[]>([]);
 
   const loadPage = useCallback(async (
     skip: number,
     query: string,
-    order: ProductSortOrder,
     replace = false,
     signal?: AbortSignal,
   ) => {
@@ -45,28 +46,32 @@ const ProductList = ({searchQuery, sortOrder}: ProductListProps) => {
         PAGE_SIZE,
         query,
         signal,
-        order,
       );
       if (requestId !== activeRequestId.current) {
         return;
       }
 
-      setProducts(current => {
-        if (replace) {
-          return result.products;
-        }
-
-        const existingIds = new Set(current.map(product => product.id));
-        return [
-          ...current,
-          ...result.products.filter(product => !existingIds.has(product.id)),
-        ];
-      });
+      const existingIds = new Set(productsRef.current.map(product => product.id));
+      const nextProducts = replace
+        ? result.products
+        : [
+            ...productsRef.current,
+            ...result.products.filter(product => !existingIds.has(product.id)),
+          ];
       const followingSkip = result.skip + result.products.length;
+      const hasMore =
+        result.products.length > 0 && followingSkip < result.total;
+
+      productsRef.current = nextProducts;
+      setProducts(nextProducts);
       setNextSkip(followingSkip);
-      setHasNextPage(
-        result.products.length > 0 && followingSkip < result.total,
-      );
+      setHasNextPage(hasMore);
+      setProductListCache(query, {
+        products: nextProducts,
+        nextSkip: followingSkip,
+        total: result.total,
+        hasNextPage: hasMore,
+      });
     } catch (error) {
       if (signal?.aborted || requestId !== activeRequestId.current) {
         return;
@@ -89,23 +94,41 @@ const ProductList = ({searchQuery, sortOrder}: ProductListProps) => {
     const controller = new AbortController();
     activeRequestId.current += 1;
     requestInProgress.current = false;
-    setProducts([]);
-    setNextSkip(0);
-    setHasNextPage(true);
-    loadPage(0, searchQuery, sortOrder, true, controller.signal);
+    const cached = getProductListCache(searchQuery);
+    const cachedProducts = cached?.products ?? [];
+    productsRef.current = cachedProducts;
+    setProducts(cachedProducts);
+    setNextSkip(cached?.nextSkip ?? 0);
+    setHasNextPage(cached?.hasNextPage ?? true);
+    setErrorMessage(null);
+
+    if (cached) {
+      setIsLoading(false);
+    } else {
+      loadPage(0, searchQuery, true, controller.signal);
+    }
 
     return () => {
       controller.abort();
       activeRequestId.current += 1;
       requestInProgress.current = false;
     };
-  }, [loadPage, searchQuery, sortOrder]);
+  }, [loadPage, searchQuery]);
 
   const handleEndReached = () => {
     if (hasNextPage && !requestInProgress.current) {
-      loadPage(nextSkip, searchQuery, sortOrder);
+      loadPage(nextSkip, searchQuery);
     }
   };
+
+  const sortedProducts = useMemo(
+    () =>
+      [...products].sort((first, second) => {
+        const comparison = first.title.localeCompare(second.title);
+        return sortOrder === 'asc' ? comparison : -comparison;
+      }),
+    [products, sortOrder],
+  );
 
   const renderItem = ({item}: {item: Product}) => (
     <ProductCard product={item} />
@@ -120,7 +143,7 @@ const ProductList = ({searchQuery, sortOrder}: ProductListProps) => {
       return (
         <View style={styles.state}>
           <Text style={styles.stateText}>{errorMessage}</Text>
-          <Pressable onPress={() => loadPage(0, searchQuery, sortOrder, true)}>
+          <Pressable onPress={() => loadPage(0, searchQuery, true)}>
             <Text style={styles.retry}>{strings.productsRetry}</Text>
           </Pressable>
         </View>
@@ -135,7 +158,7 @@ const ProductList = ({searchQuery, sortOrder}: ProductListProps) => {
       <ActivityIndicator color={colors.accentRed} style={styles.footer} />
     ) : errorMessage && products.length > 0 ? (
       <Pressable
-        onPress={() => loadPage(nextSkip, searchQuery, sortOrder)}
+        onPress={() => loadPage(nextSkip, searchQuery)}
         style={styles.footer}>
         <Text style={styles.retry}>{strings.productsRetry}</Text>
       </Pressable>
@@ -143,7 +166,7 @@ const ProductList = ({searchQuery, sortOrder}: ProductListProps) => {
 
   return (
     <FlashList
-      data={products}
+      data={sortedProducts}
       renderItem={renderItem}
       keyExtractor={item => String(item.id)}
       numColumns={2}

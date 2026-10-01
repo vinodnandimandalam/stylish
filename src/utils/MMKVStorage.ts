@@ -13,3 +13,16 @@ export const getBoolean = (key: string): boolean | undefined =>
 export const setBoolean = (key: string, value: boolean): void => {
   storage.set(key, value);
 };
+
+export const getString = (key: string): string | undefined =>
+  storage.getString(key);
+
+export const setString = (key: string, value: string): void => {
+  storage.set(key, value);
+};
+
+export const getAllKeys = (): string[] => storage.getAllKeys();
+
+export const removeKey = (key: string): void => {
+  storage.remove(key);
+};
