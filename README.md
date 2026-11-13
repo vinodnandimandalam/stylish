@@ -73,6 +73,54 @@ When you want to forcefully reload, for example to reset the state of your app, 
 - **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
 - **iOS**: Press <kbd>R</kbd> in iOS Simulator.
 
+## Android storage TurboModule
+
+The Settings screen shows the available space on the filesystem containing the
+app's internal files. This is a small example of exposing an Android API to
+React Native through a TurboModule:
+
+1. **Define the contract:** [NativeStylishStorage.ts](./src/specs/NativeStylishStorage.ts)
+   declares `getAvailableBytes(): Promise<number>` and looks up the module by
+   the name `NativeStylishStorage`.
+2. **Generate the native contract:** React Native Codegen reads the spec using
+   `codegenConfig` in [package.json](./package.json) and generates
+   `NativeStylishStorageSpec` under `android/app/build/generated/source/codegen/`.
+   The generated Java method receives a `Promise` parameter. Do not edit
+   generated files; Codegen recreates them during the Android build.
+3. **Implement Android behavior:** [NativeStylishStorageModule.kt](./android/app/src/main/java/com/stylish/NativeStylishStorageModule.kt)
+   extends the generated spec and uses Android `StatFs` on `filesDir` to resolve
+   the available byte count, or reject the promise if the filesystem cannot be
+   inspected. This does not require a storage permission.
+4. **Register the module:** [NativeStylishStoragePackage.kt](./android/app/src/main/java/com/stylish/NativeStylishStoragePackage.kt)
+   maps the generated module name to the Kotlin implementation. The package is
+   added in [MainApplication.kt](./android/app/src/main/java/com/stylish/MainApplication.kt).
+5. **Use it in React:** [Settings.tsx](./src/modules/settings/Settings.tsx)
+   calls the module, shows a loading or error state, and displays a warning
+   when less than 1 GiB is available. The refresh button requests a new reading.
+
+To try it, start Metro, rebuild the Android app with `npm run android`, and
+open **Settings**. Native code or registration changes require a native
+rebuild; Fast Refresh alone is not enough. To run just Codegen or the focused
+UI tests:
+
+```sh
+cd android && ./gradlew :app:generateCodegenArtifactsFromSchema
+```
+
+```sh
+npm test -- --runInBand __tests__/StorageSettings.test.tsx
+```
+
+The reading is a snapshot of available filesystem space, not the size of the
+product cache or a guarantee that a later write will succeed. It does not
+change the app's caching policy. The UI tests mock the native module; use an
+Android device or emulator to verify the real native call.
+
+For an interview, explain the problem, then trace the typed TypeScript contract
+through Codegen, the Kotlin `StatFs` implementation, package registration, and
+the React UI. Mention error handling and why cache writes still need their own
+failure handling even when the storage reading looks healthy.
+
 ## Congratulations! :tada:
 
 You've successfully run and modified your React Native App. :partying_face:
