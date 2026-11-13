@@ -5,7 +5,11 @@ import {AppButton, EmailInput, PasswordInput} from '../../components';
 import {strings} from '../../constants/strings';
 import {colors} from '../../theme/colors';
 import {useAppDispatch, useAppSelector} from '../../store/hooks';
-import {clearLoginError, login} from '../../store/authSlice';
+import {
+    clearLoginError,
+    clearSessionRestoreError,
+    login,
+} from '../../store/authSlice';
 import {validateIdentifier, validatePassword} from './validations';
 
 const Login = () => {
@@ -15,7 +19,9 @@ const Login = () => {
     const [identifierTouched, setIdentifierTouched] = useState(false);
     const [passwordTouched, setPasswordTouched] = useState(false);
     const isLoading = useAppSelector(state => state.auth.loginStatus === 'loading');
-    const requestError = useAppSelector(state => state.auth.loginError);
+    const requestError = useAppSelector(
+        state => state.auth.loginError ?? state.auth.sessionRestoreError,
+    );
 
     const identifierError = validateIdentifier(identifier);
     const passwordError = validatePassword(password);
@@ -47,6 +53,7 @@ const Login = () => {
                         onChangeText={value => {
                             setIdentifier(value);
                             dispatch(clearLoginError());
+                            dispatch(clearSessionRestoreError());
                         }}
                         onBlur={() => setIdentifierTouched(true)}
                         errorMessage={
@@ -58,6 +65,7 @@ const Login = () => {
                         onChangeText={value => {
                             setPassword(value);
                             dispatch(clearLoginError());
+                            dispatch(clearSessionRestoreError());
                         }}
                         onBlur={() => setPasswordTouched(true)}
                         errorMessage={passwordTouched ? passwordError : undefined}

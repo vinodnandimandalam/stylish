@@ -2,7 +2,6 @@ import {createMMKV} from 'react-native-mmkv';
 
 export const STORAGE_KEYS = {
   HAS_SEEN_ONBOARDING: 'hasSeenOnboarding',
-  IS_LOGGED_IN: 'isLoggedIn',
 } as const;
 
 const storage = createMMKV();

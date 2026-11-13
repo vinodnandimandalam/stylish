@@ -23,6 +23,7 @@ export const strings = {
   loginPasswordRequired: 'Password is required.',
   loginFailed: 'Unable to sign in with those credentials.',
   loginTokenMissing: 'Login succeeded but the access token was missing.',
+  loginRefreshTokenMissing: 'Login succeeded but the refresh token was missing.',
   loginNetworkError: 'Could not connect. Check your connection and try again.',
   dashboardTitle: 'Dashboard',
   homeTitle: 'Home',

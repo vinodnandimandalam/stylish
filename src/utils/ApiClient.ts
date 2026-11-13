@@ -3,6 +3,7 @@ import {API_BASE_URL} from '../constants/api';
 type ApiRequestOptions = {
   headers?: Record<string, string>;
   baseUrl?: string;
+  accessToken?: string;
   signal?: AbortSignal;
 };
 
@@ -37,13 +38,14 @@ const request = async <Response>(
   body?: unknown,
   options: ApiRequestOptions = {},
 ): Promise<Response> => {
-  const {baseUrl = API_BASE_URL, headers, signal} = options;
+  const {baseUrl = API_BASE_URL, accessToken, headers, signal} = options;
   const response = await fetch(`${baseUrl}${endpoint}`, {
     method,
     signal,
     headers: {
       Accept: 'application/json',
       ...(body === undefined ? {} : {'Content-Type': 'application/json'}),
+      ...(accessToken ? {Authorization: `Bearer ${accessToken}`} : {}),
       ...headers,
     },
     ...(body === undefined ? {} : {body: JSON.stringify(body)}),

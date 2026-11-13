@@ -17,6 +17,16 @@ export type LoginResponse = {
   };
 };
 
+export type RefreshTokenResponse = {
+  data: {
+    accessToken: string;
+    refreshToken: string;
+  };
+  message: string;
+  statusCode: number;
+  success: boolean;
+};
+
 export const loginUser = async (
   credentials: LoginRequest,
 ): Promise<LoginResponse> => {
@@ -24,6 +34,21 @@ export const loginUser = async (
     API_ENDPOINTS.AUTH.LOGIN,
     credentials,
   );
+
+  if (response?.success === false) {
+    throw new Error(response.message || strings.loginFailed);
+  }
+
+  return response;
+};
+
+export const refreshAccessToken = async (
+  refreshToken: string,
+): Promise<RefreshTokenResponse> => {
+  const response = await apiClient.post<
+    RefreshTokenResponse,
+    {refreshToken: string}
+  >(API_ENDPOINTS.AUTH.REFRESH_TOKEN, {refreshToken});
 
   if (response?.success === false) {
     throw new Error(response.message || strings.loginFailed);
