@@ -9,13 +9,16 @@ import Dashboard from '../modules/dashboard/Dashboard';
 import TabPlaceholder from '../modules/dashboard/TabPlaceholder';
 import OnBoarding from '../modules/onboarding/OnBoarding';
 import Settings from '../modules/settings/Settings';
+import ProductDetails from '../modules/dashboard/ProductDetails';
 import {
   PrivateTabName,
   PrivateTabParamList,
+  PrivateStackParamList,
   PublicRouteName,
   SCREENS,
 } from './Screens';
 import {colors} from '../theme/colors';
+import {strings} from '../constants/strings';
 
 export type PublicStackParamList = {
   [SCREENS.PUBLIC.ONBOARDING]: undefined;
@@ -26,6 +29,7 @@ export type PublicStackParamList = {
 
 const PublicStack = createNativeStackNavigator<PublicStackParamList>();
 const PrivateTabs = createBottomTabNavigator<PrivateTabParamList>();
+const PrivateStack = createNativeStackNavigator<PrivateStackParamList>();
 
 const tabIcons = {
   [SCREENS.PRIVATE.HOME]: require('../assets/images/home-icon.png'),
@@ -79,30 +83,46 @@ export function PublicNavigator({
 
 export function PrivateNavigator() {
   return (
-    <PrivateTabs.Navigator
-      initialRouteName={SCREENS.PRIVATE.HOME}
-      screenOptions={({route}) => ({
-        headerShown: false,
-        tabBarActiveTintColor: colors.accentRed,
-        tabBarInactiveTintColor: colors.textPrimary,
-        tabBarLabelStyle: styles.tabLabel,
-        tabBarStyle: styles.tabBar,
-        tabBarIcon: ({color}) => renderTabIcon(route.name, color),
-      })}>
-      <PrivateTabs.Screen
-        name={SCREENS.PRIVATE.HOME}
-        component={Dashboard}
+    <PrivateStack.Navigator>
+      <PrivateStack.Screen
+        name={SCREENS.PRIVATE.TABS}
+        options={{headerShown: false}}>
+        {() => (
+          <PrivateTabs.Navigator
+            initialRouteName={SCREENS.PRIVATE.HOME}
+            screenOptions={({route}) => ({
+              headerShown: false,
+              tabBarActiveTintColor: colors.accentRed,
+              tabBarInactiveTintColor: colors.textPrimary,
+              tabBarLabelStyle: styles.tabLabel,
+              tabBarStyle: styles.tabBar,
+              tabBarIcon: ({color}) => renderTabIcon(route.name, color),
+            })}>
+            <PrivateTabs.Screen
+              name={SCREENS.PRIVATE.HOME}
+              component={Dashboard}
+            />
+            <PrivateTabs.Screen
+              name={SCREENS.PRIVATE.WISHLIST}
+              component={WishlistTab}
+            />
+            <PrivateTabs.Screen
+              name={SCREENS.PRIVATE.CART}
+              component={CartTab}
+            />
+            <PrivateTabs.Screen
+              name={SCREENS.PRIVATE.SETTINGS}
+              component={Settings}
+            />
+          </PrivateTabs.Navigator>
+        )}
+      </PrivateStack.Screen>
+      <PrivateStack.Screen
+        name={SCREENS.PRIVATE.PRODUCT_DETAILS}
+        component={ProductDetails}
+        options={{title: strings.productDetailsTitle}}
       />
-      <PrivateTabs.Screen
-        name={SCREENS.PRIVATE.WISHLIST}
-        component={WishlistTab}
-      />
-      <PrivateTabs.Screen name={SCREENS.PRIVATE.CART} component={CartTab} />
-      <PrivateTabs.Screen
-        name={SCREENS.PRIVATE.SETTINGS}
-        component={Settings}
-      />
-    </PrivateTabs.Navigator>
+    </PrivateStack.Navigator>
   );
 }
 

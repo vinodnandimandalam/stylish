@@ -1,5 +1,8 @@
 import {API_BASE_URL} from '../src/constants/api';
-import {getProductsPage} from '../src/modules/dashboard/productService';
+import {
+  getProductById,
+  getProductsPage,
+} from '../src/modules/dashboard/productService';
 
 const response = {
   data: {
@@ -69,4 +72,23 @@ test('searches returned products by title or category', async () => {
   expect(categoryResult.products).toEqual([response.data.data[0]]);
   expect(titleResult.products).toEqual([response.data.data[1]]);
   expect(categoryResult.total).toBe(2);
+});
+
+test('fetches a product by ID from the public endpoint', async () => {
+  const product = response.data.data[0];
+  const fetchMock = jest.spyOn(globalThis, 'fetch').mockResolvedValue({
+    ok: true,
+    text: async () =>
+      JSON.stringify({
+        data: product,
+        message: 'Product fetched successfully',
+        success: true,
+      }),
+  } as Response);
+
+  await expect(getProductById(product.id)).resolves.toEqual(product);
+  expect(fetchMock).toHaveBeenCalledWith(
+    `${API_BASE_URL}/public/randomproducts/${product.id}`,
+    expect.objectContaining({method: 'GET'}),
+  );
 });

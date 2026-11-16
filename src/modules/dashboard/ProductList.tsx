@@ -13,9 +13,14 @@ const PAGE_SIZE = 10;
 type ProductListProps = {
   searchQuery: string;
   sortOrder: ProductSortOrder;
+  onProductPress: (product: Product) => void;
 };
 
-const ProductList = ({searchQuery, sortOrder}: ProductListProps) => {
+const ProductList = ({
+  searchQuery,
+  sortOrder,
+  onProductPress,
+}: ProductListProps) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [nextSkip, setNextSkip] = useState(0);
   const [hasNextPage, setHasNextPage] = useState(true);
@@ -129,7 +134,7 @@ const ProductList = ({searchQuery, sortOrder}: ProductListProps) => {
   );
 
   const renderItem = ({item}: {item: Product}) => (
-    <ProductCard product={item} />
+    <ProductCard product={item} onPress={() => onProductPress(item)} />
   );
 
   const emptyState = () => {

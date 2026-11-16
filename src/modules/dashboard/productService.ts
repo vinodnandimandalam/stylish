@@ -16,6 +16,28 @@ type RandomProductsResponse = {
   success: boolean;
 };
 
+type ProductByIdResponse = {
+  data: ProductPageResponse['products'][number];
+  message: string;
+  success: boolean;
+};
+
+export const getProductById = async (
+  productId: number,
+  signal?: AbortSignal,
+): Promise<ProductPageResponse['products'][number]> => {
+  const response = await apiClient.get<ProductByIdResponse>(
+    `${API_ENDPOINTS.ECOMMERCE.RANDOM_PRODUCTS}/${productId}`,
+    {baseUrl: API_BASE_URL, signal},
+  );
+
+  if (!response.success) {
+    throw new Error(response.message || 'Could not load product.');
+  }
+
+  return response.data;
+};
+
 export const getProductsPage = async (
   page = 1,
   searchQuery = '',

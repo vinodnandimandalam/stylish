@@ -1,4 +1,8 @@
 import React, {useState} from 'react';
+import type {CompositeNavigationProp} from '@react-navigation/native';
+import type {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {useNavigation} from '@react-navigation/native';
 import {Pressable, StyleSheet, Text, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Icon} from '@rneui/themed';
@@ -7,9 +11,20 @@ import {ProductSearchInput} from '../../components';
 import {strings} from '../../constants/strings';
 import {colors} from '../../theme/colors';
 import ProductList from './ProductList';
-import type {ProductSortOrder} from './productTypes';
+import type {Product, ProductSortOrder} from './productTypes';
+import {
+  PrivateStackParamList,
+  PrivateTabParamList,
+  SCREENS,
+} from '../../routes/Screens';
+
+type DashboardNavigationProp = CompositeNavigationProp<
+  BottomTabNavigationProp<PrivateTabParamList, typeof SCREENS.PRIVATE.HOME>,
+  NativeStackNavigationProp<PrivateStackParamList>
+>;
 
 const Dashboard = () => {
+  const navigation = useNavigation<DashboardNavigationProp>();
   const [searchText, setSearchText] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [sortOrder, setSortOrder] = useState<ProductSortOrder>('asc');
@@ -69,7 +84,15 @@ const Dashboard = () => {
           </Pressable>
         </View>
       </View>
-      <ProductList searchQuery={debouncedQuery} sortOrder={sortOrder} />
+      <ProductList
+        searchQuery={debouncedQuery}
+        sortOrder={sortOrder}
+        onProductPress={(product: Product) =>
+          navigation.navigate(SCREENS.PRIVATE.PRODUCT_DETAILS, {
+            productId: product.id,
+          })
+        }
+      />
     </SafeAreaView>
   );
 };

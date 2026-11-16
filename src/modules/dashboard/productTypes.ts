@@ -5,6 +5,11 @@ export type Product = {
   thumbnail?: string;
   images?: string[];
   category?: string;
+  description?: string;
+  brand?: string;
+  stock?: number;
+  discountPercentage?: number;
+  rating?: number;
 };
 
 export type ProductPageResponse = {

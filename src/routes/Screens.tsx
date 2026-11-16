@@ -10,6 +10,8 @@ export const SCREENS = {
     WISHLIST: 'Wishlist',
     CART: 'Cart',
     SETTINGS: 'Settings',
+    TABS: 'MainTabs',
+    PRODUCT_DETAILS: 'ProductDetails',
   },
 } as const;
 
@@ -20,11 +22,19 @@ export type PublicRouteName =
   | typeof SCREENS.PUBLIC.FORGOT_PASSWORD;
 
 export type PrivateTabName =
-  (typeof SCREENS.PRIVATE)[keyof typeof SCREENS.PRIVATE];
+  | typeof SCREENS.PRIVATE.HOME
+  | typeof SCREENS.PRIVATE.WISHLIST
+  | typeof SCREENS.PRIVATE.CART
+  | typeof SCREENS.PRIVATE.SETTINGS;
 
 export type PrivateTabParamList = {
   [SCREENS.PRIVATE.HOME]: undefined;
   [SCREENS.PRIVATE.WISHLIST]: undefined;
   [SCREENS.PRIVATE.CART]: undefined;
   [SCREENS.PRIVATE.SETTINGS]: undefined;
+};
+
+export type PrivateStackParamList = {
+  [SCREENS.PRIVATE.TABS]: undefined;
+  [SCREENS.PRIVATE.PRODUCT_DETAILS]: {productId: number};
 };
