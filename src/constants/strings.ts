@@ -48,7 +48,6 @@ export const strings = {
   productsError: 'Could not load products.',
   productsRetry: 'Try again',
   productsLoading: 'Loading products...',
-  productRatingLabel: 'Rating',
   logoutButton: 'Logout',
   logoutFailed: 'Unable to log out. Please try again.',
 };

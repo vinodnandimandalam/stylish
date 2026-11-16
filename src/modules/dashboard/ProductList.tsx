@@ -42,8 +42,7 @@ const ProductList = ({searchQuery, sortOrder}: ProductListProps) => {
 
     try {
       const result = await getProductsPage(
-        skip,
-        PAGE_SIZE,
+        Math.floor(skip / PAGE_SIZE) + 1,
         query,
         signal,
       );
@@ -58,9 +57,8 @@ const ProductList = ({searchQuery, sortOrder}: ProductListProps) => {
             ...productsRef.current,
             ...result.products.filter(product => !existingIds.has(product.id)),
           ];
-      const followingSkip = result.skip + result.products.length;
-      const hasMore =
-        result.products.length > 0 && followingSkip < result.total;
+      const followingSkip = result.page * result.limit;
+      const hasMore = followingSkip < result.total;
 
       productsRef.current = nextProducts;
       setProducts(nextProducts);

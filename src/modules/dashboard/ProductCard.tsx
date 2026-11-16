@@ -1,7 +1,6 @@
 import React from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
 import Card from '../../components/Card';
-import {strings} from '../../constants/strings';
 import {colors} from '../../theme/colors';
 import type {Product} from './productTypes';
 
@@ -17,10 +16,6 @@ const formatPrice = (price: number) =>
   }).format(price);
 
 const ProductCard = ({product}: ProductCardProps) => {
-  const previousPrice =
-    product.discountPercentage > 0 && product.discountPercentage < 100
-      ? product.price / (1 - product.discountPercentage / 100)
-      : undefined;
   const imageUrl = product.thumbnail || product.images?.[0];
 
   return (
@@ -38,22 +33,13 @@ const ProductCard = ({product}: ProductCardProps) => {
         <Text numberOfLines={1} style={styles.name}>
           {product.title}
         </Text>
-        <Text numberOfLines={2} style={styles.description}>
-          {product.description}
-        </Text>
+        {product.category ? (
+          <Text numberOfLines={1} style={styles.category}>
+            {product.category}
+          </Text>
+        ) : null}
         <Text style={styles.price}>
           {formatPrice(product.price)}
-        </Text>
-        {previousPrice ? (
-          <View style={styles.discountRow}>
-            <Text style={styles.previousPrice}>{formatPrice(previousPrice)}</Text>
-            <Text style={styles.discount}>
-              {Math.round(product.discountPercentage)}% off
-            </Text>
-          </View>
-        ) : null}
-        <Text style={styles.rating}>
-          {strings.productRatingLabel} {product.rating.toFixed(1)}
         </Text>
       </View>
     </Card>
@@ -82,38 +68,16 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
   },
-  description: {
-    minHeight: 38,
+  category: {
     marginTop: 4,
     color: colors.textSecondary,
     fontSize: 13,
-    lineHeight: 19,
   },
   price: {
     marginTop: 5,
     color: colors.textPrimary,
     fontSize: 16,
     fontWeight: '600',
-  },
-  discountRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginTop: 3,
-  },
-  previousPrice: {
-    color: colors.disabled,
-    fontSize: 12,
-    textDecorationLine: 'line-through',
-  },
-  discount: {
-    color: colors.accentRed,
-    fontSize: 12,
-  },
-  rating: {
-    marginTop: 4,
-    color: colors.textSecondary,
-    fontSize: 12,
   },
 });
 

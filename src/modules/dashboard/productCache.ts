@@ -1,7 +1,8 @@
 import {getAllKeys, getString, removeKey, setString} from '../../utils/MMKVStorage';
 import type {Product} from './productTypes';
 
-const CACHE_KEY_PREFIX = 'product-list:';
+const CACHE_KEY_PREFIX = 'product-list:v2:';
+const ALL_CACHE_KEY_PREFIX = 'product-list:';
 
 export type ProductListCache = {
   products: Product[];
@@ -37,6 +38,6 @@ export const setProductListCache = (
 
 export const clearProductListCache = (): void => {
   getAllKeys()
-    .filter(key => key.startsWith(CACHE_KEY_PREFIX))
+    .filter(key => key.startsWith(ALL_CACHE_KEY_PREFIX))
     .forEach(removeKey);
 };
