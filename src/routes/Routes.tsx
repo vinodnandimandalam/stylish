@@ -60,7 +60,13 @@ export function PublicNavigator({
     <PublicStack.Navigator
       initialRouteName={initialRouteName}
       screenOptions={{headerShown: false}}>
-      <PublicStack.Screen name={SCREENS.PUBLIC.ONBOARDING} component={OnBoarding} />
+      <PublicStack.Screen name={SCREENS.PUBLIC.ONBOARDING}>
+        {({navigation}) => (
+          <OnBoarding
+            onFinish={() => navigation.replace(SCREENS.PUBLIC.LOGIN)}
+          />
+        )}
+      </PublicStack.Screen>
       <PublicStack.Screen name={SCREENS.PUBLIC.LOGIN} component={Login} />
       <PublicStack.Screen name={SCREENS.PUBLIC.REGISTER} component={Register} />
       <PublicStack.Screen

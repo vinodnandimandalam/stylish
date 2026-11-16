@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import OnboardingCarousel, {
   OnboardingSlide,
@@ -37,19 +37,14 @@ type OnBoardingProps = {
 };
 
 const OnBoarding = ({onFinish, onSkip}: OnBoardingProps) => {
-  useEffect(() => {
-    setBoolean(STORAGE_KEYS.HAS_SEEN_ONBOARDING, true);
-  }, []);
-
   const handleFinish = () => {
-    console.log('Onboarding finished');
+    setBoolean(STORAGE_KEYS.HAS_SEEN_ONBOARDING, true);
     onFinish?.();
   };
 
   const handleSkip = () => {
-    console.log('Onboarding skipped');
     onSkip?.();
-    onFinish?.();
+    handleFinish();
   };
 
   return (
