@@ -6,7 +6,7 @@ import Login from '../modules/login/Login';
 import Register from '../modules/register/Register';
 import ForgetPwd from '../modules/forget-pwd/ForgetPwd';
 import Dashboard from '../modules/dashboard/Dashboard';
-import TabPlaceholder from '../modules/dashboard/TabPlaceholder';
+import Cart from '../modules/dashboard/Cart';
 import Wishlist from '../modules/dashboard/Wishlist';
 import OnBoarding from '../modules/onboarding/OnBoarding';
 import Settings from '../modules/settings/Settings';
@@ -38,8 +38,6 @@ const tabIcons = {
   [SCREENS.PRIVATE.CART]: require('../assets/images/cart-icon.png'),
   [SCREENS.PRIVATE.SETTINGS]: require('../assets/images/settings.png'),
 };
-
-const CartTab = () => <TabPlaceholder title={SCREENS.PRIVATE.CART} />;
 
 const renderTabIcon = (routeName: PrivateTabName, color: string) => {
   return (
@@ -106,7 +104,7 @@ export function PrivateNavigator() {
             />
             <PrivateTabs.Screen
               name={SCREENS.PRIVATE.CART}
-              component={CartTab}
+              component={Cart}
             />
             <PrivateTabs.Screen
               name={SCREENS.PRIVATE.SETTINGS}

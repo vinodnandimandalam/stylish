@@ -49,10 +49,13 @@ export const strings = {
 productsRetry: 'Try again',
   productsLoading: 'Loading products...',
   wishlistEmpty: 'Your wishlist is empty.',
+  cartEmpty: 'Your cart is empty.',
+  cartSubtotal: 'Subtotal',
   productDetailsTitle: 'Product details',
   productDetailsError: 'Could not load product.',
   buyNow: 'Buy now',
   addToCart: 'Add to cart',
+  addedToCart: 'Added to cart',
   logoutButton: 'Logout',
   logoutFailed: 'Unable to log out. Please try again.',
 };

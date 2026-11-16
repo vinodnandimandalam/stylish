@@ -13,6 +13,7 @@ import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {strings} from '../../constants/strings';
 import {PrivateStackParamList, SCREENS} from '../../routes/Screens';
+import {addProductToCart} from '../../store/cartSlice';
 import {useAppDispatch, useAppSelector} from '../../store/hooks';
 import {toggleWishlistProduct} from '../../store/wishlistSlice';
 import {colors} from '../../theme/colors';
@@ -36,6 +37,9 @@ const ProductDetails = ({route}: ProductDetailsProps) => {
   const dispatch = useAppDispatch();
   const isWishlisted = useAppSelector(state =>
     state.wishlist.products.some(item => item.id === productId),
+  );
+  const isInCart = useAppSelector(state =>
+    state.cart.items.some(item => item.product.id === productId),
   );
   const [product, setProduct] = useState<Product | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -147,11 +151,24 @@ const ProductDetails = ({route}: ProductDetailsProps) => {
       <View style={styles.actions}>
         <Pressable
           accessibilityRole="button"
-          accessibilityState={{disabled: true}}
-          disabled
-          style={[styles.button, styles.secondaryButton]}>
-          <Text style={[styles.buttonText, styles.secondaryButtonText]}>
-            {strings.addToCart}
+          accessibilityLabel={
+            isInCart ? strings.addedToCart : strings.addToCart
+          }
+          accessibilityState={{disabled: isInCart}}
+          disabled={isInCart}
+          onPress={() => dispatch(addProductToCart(product))}
+          style={[
+            styles.button,
+            styles.secondaryButton,
+            isInCart && styles.disabledButton,
+          ]}>
+          <Text
+            style={[
+              styles.buttonText,
+              styles.secondaryButtonText,
+              isInCart && styles.disabledButtonText,
+            ]}>
+            {isInCart ? strings.addedToCart : strings.addToCart}
           </Text>
         </Pressable>
         <Pressable
@@ -248,6 +265,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.accentRed,
   },
+  disabledButton: {
+    backgroundColor: colors.inputBackground,
+    borderColor: colors.inputBorder,
+  },
   buttonText: {
     color: colors.white,
     fontSize: 16,
@@ -255,6 +276,9 @@ const styles = StyleSheet.create({
   },
   secondaryButtonText: {
     color: colors.accentRed,
+  },
+  disabledButtonText: {
+    color: colors.textSecondary,
   },
   state: {
     flex: 1,
