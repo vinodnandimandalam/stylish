@@ -8,10 +8,13 @@ import {
   Text,
   View,
 } from 'react-native';
+import {Icon} from '@rneui/themed';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {strings} from '../../constants/strings';
 import {PrivateStackParamList, SCREENS} from '../../routes/Screens';
+import {useAppDispatch, useAppSelector} from '../../store/hooks';
+import {toggleWishlistProduct} from '../../store/wishlistSlice';
 import {colors} from '../../theme/colors';
 import type {Product} from './productTypes';
 import {getProductById} from './productService';
@@ -30,6 +33,10 @@ const formatPrice = (price: number) =>
 
 const ProductDetails = ({route}: ProductDetailsProps) => {
   const {productId} = route.params;
+  const dispatch = useAppDispatch();
+  const isWishlisted = useAppSelector(state =>
+    state.wishlist.products.some(item => item.id === productId),
+  );
   const [product, setProduct] = useState<Product | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -89,15 +96,37 @@ const ProductDetails = ({route}: ProductDetailsProps) => {
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView contentContainerStyle={styles.content}>
-        {imageUrl ? (
-          <Image
-            source={{uri: imageUrl}}
-            style={styles.image}
-            resizeMode="contain"
-          />
-        ) : (
-          <View style={[styles.image, styles.imagePlaceholder]} />
-        )}
+        <View>
+          {imageUrl ? (
+            <Image
+              source={{uri: imageUrl}}
+              style={styles.image}
+              resizeMode="contain"
+            />
+          ) : (
+            <View style={[styles.image, styles.imagePlaceholder]} />
+          )}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={
+              isWishlisted
+                ? `Remove ${product.title} from wishlist`
+                : `Add ${product.title} to wishlist`
+            }
+            accessibilityState={{selected: isWishlisted}}
+            onPress={() => dispatch(toggleWishlistProduct(product))}
+            style={styles.wishlistButton}
+            hitSlop={8}>
+            <Icon
+              type="material"
+              iconProps={{
+                name: isWishlisted ? 'favorite' : 'favorite-border',
+                size: 24,
+                color: isWishlisted ? colors.accentRed : colors.textPrimary,
+              }}
+            />
+          </Pressable>
+        </View>
         <View style={styles.details}>
           {product.category ? (
             <Text style={styles.category}>{product.category}</Text>
@@ -152,6 +181,18 @@ const styles = StyleSheet.create({
   },
   imagePlaceholder: {
     backgroundColor: colors.inputBackground,
+  },
+  wishlistButton: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 22,
+    backgroundColor: colors.white,
+    elevation: 2,
   },
   details: {
     padding: 20,

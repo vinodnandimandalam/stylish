@@ -1,6 +1,9 @@
 import React from 'react';
 import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
+import {Icon} from '@rneui/themed';
 import Card from '../../components/Card';
+import {useAppDispatch, useAppSelector} from '../../store/hooks';
+import {toggleWishlistProduct} from '../../store/wishlistSlice';
 import {colors} from '../../theme/colors';
 import type {Product} from './productTypes';
 
@@ -17,14 +20,18 @@ const formatPrice = (price: number) =>
   }).format(price);
 
 const ProductCard = ({product, onPress}: ProductCardProps) => {
+  const dispatch = useAppDispatch();
+  const isWishlisted = useAppSelector(state =>
+    state.wishlist.products.some(item => item.id === product.id),
+  );
   const imageUrl = product.thumbnail || product.images?.[0];
 
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={`View ${product.title}`}
-      onPress={onPress}>
-      <Card style={styles.card}>
+    <Card style={styles.card}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`View ${product.title}`}
+        onPress={onPress}>
         {imageUrl ? (
           <Image
             source={{uri: imageUrl}}
@@ -45,14 +52,35 @@ const ProductCard = ({product, onPress}: ProductCardProps) => {
           ) : null}
           <Text style={styles.price}>{formatPrice(product.price)}</Text>
         </View>
-      </Card>
-    </Pressable>
+      </Pressable>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={
+          isWishlisted
+            ? `Remove ${product.title} from wishlist`
+            : `Add ${product.title} to wishlist`
+        }
+        accessibilityState={{selected: isWishlisted}}
+        onPress={() => dispatch(toggleWishlistProduct(product))}
+        style={styles.wishlistButton}
+        hitSlop={8}>
+        <Icon
+          type="material"
+          iconProps={{
+            name: isWishlisted ? 'favorite' : 'favorite-border',
+            size: 22,
+            color: isWishlisted ? colors.accentRed : colors.textPrimary,
+          }}
+        />
+      </Pressable>
+    </Card>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
     flex: 1,
+    position: 'relative',
     marginHorizontal: 6,
     marginBottom: 12,
   },
@@ -82,6 +110,18 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontSize: 16,
     fontWeight: '600',
+  },
+  wishlistButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 38,
+    height: 38,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 19,
+    backgroundColor: colors.white,
+    elevation: 2,
   },
 });
 

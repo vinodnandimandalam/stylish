@@ -7,6 +7,7 @@ import Register from '../modules/register/Register';
 import ForgetPwd from '../modules/forget-pwd/ForgetPwd';
 import Dashboard from '../modules/dashboard/Dashboard';
 import TabPlaceholder from '../modules/dashboard/TabPlaceholder';
+import Wishlist from '../modules/dashboard/Wishlist';
 import OnBoarding from '../modules/onboarding/OnBoarding';
 import Settings from '../modules/settings/Settings';
 import ProductDetails from '../modules/dashboard/ProductDetails';
@@ -38,9 +39,6 @@ const tabIcons = {
   [SCREENS.PRIVATE.SETTINGS]: require('../assets/images/settings.png'),
 };
 
-const WishlistTab = () => (
-  <TabPlaceholder title={SCREENS.PRIVATE.WISHLIST} />
-);
 const CartTab = () => <TabPlaceholder title={SCREENS.PRIVATE.CART} />;
 
 const renderTabIcon = (routeName: PrivateTabName, color: string) => {
@@ -104,7 +102,7 @@ export function PrivateNavigator() {
             />
             <PrivateTabs.Screen
               name={SCREENS.PRIVATE.WISHLIST}
-              component={WishlistTab}
+              component={Wishlist}
             />
             <PrivateTabs.Screen
               name={SCREENS.PRIVATE.CART}
