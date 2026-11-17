@@ -15,4 +15,5 @@ extensions.configure(com.facebook.react.ReactSettingsExtension){ ex ->
 
 rootProject.name = 'Stylish'
 include ':app'
+include ':macrobenchmark'
 includeBuild('../node_modules/@react-native/gradle-plugin')

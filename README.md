@@ -121,6 +121,43 @@ through Codegen, the Kotlin `StatFs` implementation, package registration, and
 the React UI. Mention error handling and why cache writes still need their own
 failure handling even when the storage reading looks healthy.
 
+## Android startup macrobenchmark
+
+The `macrobenchmark` module measures cold application startup with AndroidX
+Macrobenchmark. `StartupTimingMetric` records time to initial display (TTID)
+and time to full display (TTFD). The app reports fully drawn after session
+restoration and an additional rendered frame; TTFD is used here as the
+time-to-interactive proxy. The Android app exposes a `benchmark-app-ready`
+marker after session initialization, and the benchmark waits for it (up to 15
+seconds) before ending the measurement. This prevents the splash screen's first
+frame from prematurely ending the TTFD measurement.
+
+Run the benchmark on a physical Android device for useful performance numbers:
+
+```sh
+adb shell pm clear com.stylish
+cd android
+./gradlew :macrobenchmark:connectedBenchmarkAndroidTest
+```
+
+The benchmark runs 10 cold starts with ART compilation disabled. It starts the
+launcher activity, so the current two-second splash delay is included in TTFD;
+TTID currently measures the splash screen's first frame. Results and system
+traces are written under
+`android/macrobenchmark/build/outputs/connected_android_test_additional_output/`.
+Keep the device, build variant, and app data state consistent when comparing
+results between changes.
+
+For an emulator-only smoke run, opt in to suppress Macrobenchmark's emulator
+guard:
+
+```sh
+./gradlew :macrobenchmark:connectedBenchmarkAndroidTest -PallowEmulatorBenchmark=true
+```
+
+Emulator timings are not representative and should not be used for performance
+comparisons.
+
 ## Congratulations! :tada:
 
 You've successfully run and modified your React Native App. :partying_face:
